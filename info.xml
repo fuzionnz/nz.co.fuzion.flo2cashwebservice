@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <extension key="nz.co.giantrobot.flo2cashwebservice" type="payment">
+  <file>Flo2CashWebService</file>
+  <name>Flo2Cash WSDL</name>
+  <description>Flo2Cash WSDL Payment Processor</description>
+  <urls>
+    <url desc="Main Extension Page">http://www.giantrobot.co.nz/projects/flo2cashwebservice</url>
+    <url desc="Documentation">http://www.giantrobot.co.nz/projects/flo2cashwebservice/docs</url>
+    <url desc="Support">http://www.giantrobot.co.nz/projects/flo2cashwebservice/support</url>
+    <url desc="Licensing">http://www.gnu.org/copyleft/gpl.html</url>
+  </urls>
+  <license>GPLv3+</license>
+  <maintainer>
+    <author>Chris Burgess</author>
+    <email>projects@giantrobot.co.nz</email>
+  </maintainer>
+  <releaseDate>2011-10-18</releaseDate>
+  <version>v0.1</version>
+  <develStage>development</develStage>
+  <compatibility><ver>3.4</ver></compatibility>
+  <comments></comments>
+  <typeInfo>
+   <userNameLabel>Client ID</userNameLabel>
+   <passwordLabel>Password</passwordLabel>
+   <signatureLabel>Account ID</signatureLabel>
+   <urlApiDefault>https://secure.flo2cash.co.nz/ws/paymentws.asmx?wsdl</urlApiDefault>
+   <urlApiTestDefault>http://demo.flo2cash.co.nz/ws/paymentws.asmx?wsdl</urlApiTestDefault>
+   <subjectLabel></subjectLabel>
+   <urlSiteDefault></urlSiteDefault>
+   <urlRecurDefault></urlRecurDefault>
+   <urlSiteTestDefault></urlSiteTestDefault>
+   <urlRecurTestDefault></urlRecurTestDefault>
+   <urlButtonDefault></urlButtonDefault>
+   <urlButtonTestDefault></urlButtonTestDefault>
+   <billingMode>form</billingMode>
+   <isRecur>0</isRecur>
+   <paymentType>1</paymentType>
+  </typeInfo>
+</extension>
