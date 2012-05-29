@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * @file
+ *
  * @package CRM
  * @copyright Giant Robot Ltd 2007-2012
  */
@@ -46,13 +48,16 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
    * @var object
    * @static
    */
-  static protected $_mode = null;
+  static protected $_mode = NULL;
 
-  static private $_singleton = null;
+  static private $_singleton = NULL;
 
+  /**
+   *
+   */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
-    if (self::$_singleton[$processorName] === null) {
+    if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new nz_co_giantrobot_Flo2CashWebService($mode, $paymentProcessor);
     }
     return self::$_singleton[$processorName];
@@ -83,7 +88,7 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
   /**
    * Validate configuration values.
    *
-   * @return null | string error message
+   * @return NULL | string error message
    * @public
    */
   function checkConfig() {
@@ -110,9 +115,9 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
     //self::debug($this->_paymentProcessor, '$this->_paymentProcessor');
 
     if (! empty($error)) {
-        return implode('<p>', $error);
+      return implode('<p>', $error);
     } else {
-      return null;
+      return NULL;
     }
   }
 
@@ -192,7 +197,7 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
     try {
       $PaymentService = new F2CSoapClient($this->_paymentProcessor['url_api']);
       $result = $PaymentService->ProcessPurchase($soap_vars);
-/*
+      /*
         self::debug(array(
                       '$PaymentService' => $PaymentService,
                       '$soap_vars' => $soap_vars,
@@ -201,10 +206,10 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
                       '$this' => $this,
                       'url' => $this->_paymentProcessor['url_api'],
                     ), 'success');
-*/
+      */
     }
     catch (SoapFault $fault) {
-/*
+      /*
         self::debug(array(
                       '$PaymentService' => $PaymentService,
                       '$soap_vars' => $soap_vars,
@@ -213,7 +218,7 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
                       '$this' => $this,
                       'url' => $this->_paymentProcessor['url_api'],
                     ), 'failure');
-*/
+      */
       $Actor = $fault->faultcode;
       $ErrorType = $fault->detail->error->errortype;
       $ErrorNumber = $fault->detail->error->errornumber;
@@ -272,12 +277,12 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
   /**
    *
    */
-  function &error($errorCode = null, $errorMessage = null) {
+  function &error($errorCode = NULL, $errorMessage = NULL) {
     $e =& CRM_Core_Error::singleton();
     if ($errorCode) {
-      $e->push($errorCode, 0, null, $errorMessage);
+      $e->push($errorCode, 0, NULL, $errorMessage);
     } else {
-      $e->push(9001, 0, null, 'Unknown System Error.');
+      $e->push(9001, 0, NULL, 'Unknown System Error.');
     }
     return $e;
   }
@@ -287,17 +292,17 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
    */
   function debug($debug, $label = '') {
     if (function_exists('watchdog')) {
-        watchdog('civicrm', '!label: <pre>!debug</pre>', array('!label' => $label, '!debug' => htmlspecialchars(print_r($debug,1))), WATCHDOG_DEBUG);
+      watchdog('civicrm', '!label: <pre>!debug</pre>', array('!label' => $label, '!debug' => htmlspecialchars(print_r($debug,1))), WATCHDOG_DEBUG);
     }
     if (function_exists('dpm')) {
-        dpm($debug, $label);
+      dpm($debug, $label);
     }
   }
 }
 
 class F2CSoapClient extends SoapClient {
   public function __doRequest($request, $location, $action, $version, $one_way = FALSE) {
-/*
+    /*
       nz_co_giantrobot_Flo2CashWebService::debug(array(
           'request' => $request,
           'location' => $location,
@@ -305,11 +310,11 @@ class F2CSoapClient extends SoapClient {
           'version' => $version,
           'one_way' => $one_way,
          ), 'SOAP request');
-*/
+    */
     $response = parent::__doRequest($request, $location, $action, $version, $one_way);
     // nz_co_giantrobot_Flo2CashWebService::debug($response, 'response');
     if (!$one_way) {
-        return $response;
+      return $response;
     }
   }
 }
