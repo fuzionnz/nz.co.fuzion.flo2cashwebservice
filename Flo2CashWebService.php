@@ -75,12 +75,35 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName    = ts('Flo2Cash WebService');
 
-    // @TODO would be nice to expose a config option for this, but
-    // CiviCRM only offers certain textfields AFAIK
+    // Defaults here
     $this->_setParam('emailCustomer', 'TRUE');
-    $this->_setParam('timestamp', time());
-    srand(time());
-    $this->_setParam('sequence', rand(1, 1000));
+    // We'll load settings from DB if present.
+    $settings = array(
+      'emailCustomer',
+    );
+    foreach ($settings as $setting) {
+      $setting_name = 'nz.co.fuzion.flo2cashwebservice.'.$setting;
+      $params = array(
+        'return' => $setting_name,
+        'sequential' => 1,
+      );
+      try {
+        $result = civicrm_api3('setting', 'get', $params);
+        if (isset($result['values'][0][$setting_name])) {
+          $this->_setParam($setting, $settings['values'][0][$setting_name]);
+        }
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        $errorMessage = $e->getMessage();
+        $errorCode = $e->getErrorCode();
+        $errorData = $e->getExtraParams();
+      }
+    }
+
+    // Other settings here.
+    // $this->_setParam('timestamp', time());
+    // srand(time());
+    // $this->_setParam('sequence', rand(1, 1000));
   }
 
   /**
