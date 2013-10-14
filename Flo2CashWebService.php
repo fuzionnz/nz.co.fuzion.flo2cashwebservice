@@ -9,7 +9,7 @@
 
 /*
   +--------------------------------------------------------------------+
-  | Flo2Cash Web Service v1.0                                          |
+  | Flo2Cash WebService v1.0                                          |
   +--------------------------------------------------------------------+
   | Copyright Giant Robot Ltd (c) 2007-2012                            |
   +--------------------------------------------------------------------+
@@ -40,7 +40,7 @@ require_once 'CRM/Core/Payment.php';
 /**
  * Implement a Payment Method class for CiviCRM.
  */
-class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
+class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
 
   /**
    * mode of operation: live or test
@@ -58,13 +58,13 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new nz_co_giantrobot_Flo2CashWebService($mode, $paymentProcessor);
+      self::$_singleton[$processorName] = new nz_co_fuzion_Flo2CashWebService($mode, $paymentProcessor);
     }
     return self::$_singleton[$processorName];
   }
 
   /**
-   * Constructor
+   * Constructor for nz_co_fuzion_Flo2CashWebService.
    *
    * @param string $mode the mode of operation: live or test
    *
@@ -73,9 +73,7 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName    = ts('Flo2Cash');
-
-    $config = CRM_Core_Config::singleton();
+    $this->_processorName    = ts('Flo2Cash WebService');
 
     // @TODO would be nice to expose a config option for this, but
     // CiviCRM only offers certain textfields AFAIK
@@ -132,7 +130,7 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
    */
   function doDirectPayment(&$params) {
     if (! defined('CURLOPT_SSLCERT')) {
-      return self::error(9001, 'Flo2Cash requires curl with SSL support');
+      return self::error(9001, 'Flo2Cash WebService requires curl with SSL support');
     }
 
     foreach ($params as $field => $value) {
@@ -303,7 +301,7 @@ class nz_co_giantrobot_Flo2CashWebService extends CRM_Core_Payment {
 class F2CSoapClient extends SoapClient {
   public function __doRequest($request, $location, $action, $version, $one_way = FALSE) {
     /*
-      nz_co_giantrobot_Flo2CashWebService::debug(array(
+      nz_co_fuzion_Flo2CashWebService::debug(array(
           'request' => $request,
           'location' => $location,
           'action' => $action,
@@ -312,7 +310,7 @@ class F2CSoapClient extends SoapClient {
          ), 'SOAP request');
     */
     $response = parent::__doRequest($request, $location, $action, $version, $one_way);
-    // nz_co_giantrobot_Flo2CashWebService::debug($response, 'response');
+    // nz_co_fuzion_Flo2CashWebService::debug($response, 'response');
     if (!$one_way) {
       return $response;
     }

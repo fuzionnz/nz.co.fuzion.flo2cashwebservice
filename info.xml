@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
- <extension key="nz.co.giantrobot.flo2cashwebservice" type="payment">
+ <extension key="nz.co.fuzion.flo2cashwebservice" type="payment">
   <file>Flo2CashWebService</file>
   <name>Flo2Cash WSDL</name>
   <description>Flo2Cash WSDL Payment Processor</description>
   <urls>
-    <url desc="Main Extension Page">http://www.giantrobot.co.nz/projects/flo2cashwebservice</url>
-    <url desc="Documentation">http://www.giantrobot.co.nz/projects/flo2cashwebservice/docs</url>
-    <url desc="Support">http://www.giantrobot.co.nz/projects/flo2cashwebservice/support</url>
+    <url desc="Main Extension Page">http://www.fuzion.co.nz/projects/flo2cashwebservice</url>
+    <url desc="Documentation">http://www.fuzion.co.nz/projects/flo2cashwebservice/docs</url>
+    <url desc="Support">http://www.fuzion.co.nz/projects/flo2cashwebservice/support</url>
     <url desc="Licensing">http://www.gnu.org/copyleft/gpl.html</url>
   </urls>
   <license>GPLv3+</license>
