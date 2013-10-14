@@ -53,7 +53,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
   static private $_singleton = NULL;
 
   /**
-   *
+   * @TODO Document this function.
    */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
@@ -122,11 +122,11 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
     }
 
     if (empty($this->_paymentProcessor['signature'])) {
-      $error[] = ts('Account ID is not set in Administer CiviCRM &raquo; Configure &raquo; Global Settings &raquo; Payment Processors &raquo; ' . $this->_paymentProcessor['name']);
+        $error[] = ts('Account ID is not set in Administer CiviCRM &raquo; Configure &raquo; Global Settings &raquo; Payment Processors &raquo; ' . $this->_paymentProcessor['name']);
     }
 
     if (empty($this->_paymentProcessor['password'])) {
-      $error[] = ts('Password is not set in Administer CiviCRM &raquo; Configure &raquo; Global Settings &raquo; Payment Processors &raquo; ' . $this->_paymentProcessor['name']);
+        $error[] = ts('Password is not set in Administer CiviCRM &raquo; Configure &raquo; Global Settings &raquo; Payment Processors &raquo; ' . $this->_paymentProcessor['name']);
     }
 
     if (empty($this->_paymentProcessor['url_api'])) {
@@ -166,25 +166,27 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
       'AccountId'     => $this->_paymentProcessor['signature'],
       'Amount'        => sprintf('%01.2f', $this->_getParam('amount')),
       /**
-       * I think this is a much nicer reference, but it is not
-       * unique. If you want to do this, do it in the CiviCRM
-       * alter payment processor params hook instead.
+       * I think this is a much nicer reference, but it's not
+       * unique. If you want to do this, do it in the CiviCRM alter
+       * payment processor params hook instead.
        */
       // 'Reference'    => substr(trim($this->_getParam('billing_first_name') .' '. $this->_getParam('billing_last_name') .' ('. $this->_getParam('email') .')'), 0, 50),
       'Reference'     => $this->_getParam('invoiceID'),
       'Particular'    => $this->_getParam('description'),
       'Email'         => $this->_getParam('email'),
       'CardNumber'    => $this->_getParam('credit_card_number'),
+      'CardType'      => $this->_getParam('credit_card_type'), // Modify below.
       'CardExpiry'    => str_pad($this->_getParam('month'), 2, '0', STR_PAD_LEFT) . $exp_year = substr($this->_getParam('year'), -2),
-      'CardHolderName'=> $this->_getParam('credit_card_owner'), // not used for WSDL? form element not displayed
+      // Not used for WSDL?
+      // 'CardHolderName' => $this->_getParam('credit_card_number'),
       'CardCSC'       => $this->_getParam('cvv2'),
       'StoreCard'     => 0
     );
 
-    // ensure amount is in F2C expected format
+    // Ensure amount is in F2C expected format.
     $soap_vars['Amount'] = sprintf("%01.2f", $soap_vars['Amount']);
 
-    // alter credit card type to F2C expected format
+    // Alter credit card type to F2C expected format.
     switch ($this->_getParam('credit_card_type')) {
       case 'Visa':
         $soap_vars['CardType'] = 'VISA';
@@ -197,18 +199,22 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
         break;
       case 'Diners Club':
       case 'Diners':
-        // Flo2Cash offers Diners which CiviCRM doesn't offer by default.
+        // Flo2Cash WebService offers Diners which CiviCRM doesn't offer by default.
         // To enable this, visit
         // civicrm/admin/options/accept_creditcard?group=accept_creditcard&reset=1
         // and add a card type of 'Diners Club'
         $soap_vars['CardType'] = 'DINERS';
         break;
       default:
-        // CiviCRM offers "Discover" by default, which Flo2Cash doesn't support.
-        // To disable this, visit the URL below and remove the card type 'Discover'
-        //   civicrm/admin/options/accept_creditcard?group=accept_creditcard&reset=1
+        // CiviCRM offers "Discover" by default, which Flo2Cash WebService
+        // doesn't support.  To disable this, visit the URL below and
+        // remove the card type 'Discover'
         //
-        // You *could* try this, which would then throw an error on processing if F2C reject it.
+        // civicrm/admin/options/accept_creditcard?group=accept_creditcard&reset=1
+        //
+        // You *could* try this, which would then throw an error on
+        // processing if F2C reject it.
+        //
         // $soap_vars['CardType'] = strtoupper($this->_getParam['credit_card_type']);
         return self::error(9004, 'Unsupported credit card type: '. $this->_getParam['credit_card_type']);
     }
@@ -219,7 +225,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
       $PaymentService = new F2CSoapClient($this->_paymentProcessor['url_api']);
       $result = $PaymentService->ProcessPurchase($soap_vars);
       /*
-        self::debug(array(
+         self::debug(array(
                       '$PaymentService' => $PaymentService,
                       '$soap_vars' => $soap_vars,
                       '$result' => $result,
@@ -231,7 +237,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
     }
     catch (SoapFault $fault) {
       /*
-        self::debug(array(
+         self::debug(array(
                       '$PaymentService' => $PaymentService,
                       '$soap_vars' => $soap_vars,
                       '$result' => $result,
@@ -296,7 +302,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
   }
 
   /**
-   *
+   * @TODO Document this function.
    */
   function &error($errorCode = NULL, $errorMessage = NULL) {
     $e =& CRM_Core_Error::singleton();
