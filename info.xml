@@ -12,12 +12,17 @@
   <license>GPLv3+</license>
   <maintainer>
     <author>Chris Burgess</author>
-    <email>projects@giantrobot.co.nz</email>
+    <email>projects@fuzion.co.nz</email>
   </maintainer>
   <releaseDate>2011-10-18</releaseDate>
   <version>v0.1</version>
   <develStage>development</develStage>
-  <compatibility><ver>3.4</ver></compatibility>
+  <compatibility>
+    <ver>3.4</ver>
+    <ver>4.2</ver>
+    <ver>4.3</ver>
+    <ver>4.4</ver>
+  </compatibility>
   <comments></comments>
   <typeInfo>
    <userNameLabel>Client ID</userNameLabel>
@@ -33,7 +38,7 @@
    <urlButtonDefault></urlButtonDefault>
    <urlButtonTestDefault></urlButtonTestDefault>
    <billingMode>form</billingMode>
-   <isRecur>0</isRecur>
+   <isRecur>1</isRecur>
    <paymentType>1</paymentType>
   </typeInfo>
 </extension>
