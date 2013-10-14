@@ -222,7 +222,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $soap_vars);
 
     try {
-      $PaymentService = new F2CSoapClient($this->_paymentProcessor['url_api']);
+      $PaymentService = new F2CSoapClient($this->_paymentProcessor['url_api'], array('trace' => 1));
       $result = $PaymentService->ProcessPurchase($soap_vars);
       /*
          self::debug(array(
