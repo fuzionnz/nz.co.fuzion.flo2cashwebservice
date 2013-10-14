@@ -246,14 +246,33 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
                       'url' => $this->_paymentProcessor['url_api'],
                     ), 'failure');
       */
-      $Actor = $fault->faultcode;
-      $ErrorType = $fault->detail->error->errortype;
-      $ErrorNumber = $fault->detail->error->errornumber;
-      $ErrorMessage = $fault->detail->error->errormessage;
+      if (isset($fault->faultcode)) {
+        $Actor = $fault->faultcode;
+      }
+      if (isset($fault->detail->error->errortype)) {
+        $ErrorType = $fault->detail->error->errortype;
+      }
+      if (isset($fault->detail->error->errornumber)) {
+        $ErrorNumber = $fault->detail->error->errornumber;
+      }
+      if (isset($fault->detail->error->errormessage)) {
+        $ErrorMessage = $fault->detail->error->errormessage;
+      }
+      elseif (isset($fault->faultstring)) {
+        $ErrorMessage = $fault->faultstring;
+      }
+      else {
+        $ErrorMessage = 'Unknown SOAP error.';
+      }
+      /*
+         dpm($PaymentService, 'PaymentService');
+         dpm($fault, 'fault');
+         dpm($PaymentService->__getLastRequest(), 'lastRequest');
+      */
       return self::error(9003, $ErrorMessage);
     }
-    catch (Exception $exp) {
-      return self::error(9002, $excp->get_errmsg());
+    catch (Exception $ex) {
+      return self::error(9002, $ex->get_errmsg());
     }
 
     if ($result->transactionresult->Status == 'SUCCESSFUL') {
