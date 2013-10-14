@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
  <extension key="nz.co.fuzion.flo2cashwebservice" type="payment">
-  <file>Flo2CashWebService</file>
+  <file>flo2cashwebservice</file>
   <name>Flo2Cash WSDL</name>
   <description>Flo2Cash WSDL Payment Processor</description>
   <urls>
