@@ -160,42 +160,21 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
       $this->_setParam($field, $value);
     }
 
-    $soap_vars = array(
-      'Username'      => $this->_paymentProcessor['user_name'],
-      'Password'      => $this->_paymentProcessor['password'],
-      'AccountId'     => $this->_paymentProcessor['signature'],
-      'Amount'        => sprintf('%01.2f', $this->_getParam('amount')),
-      /**
-       * I think this is a much nicer reference, but it's not
-       * unique. If you want to do this, do it in the CiviCRM alter
-       * payment processor params hook instead.
-       */
-      // 'Reference'    => substr(trim($this->_getParam('billing_first_name') .' '. $this->_getParam('billing_last_name') .' ('. $this->_getParam('email') .')'), 0, 50),
-      'Reference'     => $this->_getParam('invoiceID'),
-      'Particular'    => $this->_getParam('description'),
-      'Email'         => $this->_getParam('email'),
-      'CardNumber'    => $this->_getParam('credit_card_number'),
-      'CardType'      => $this->_getParam('credit_card_type'), // Modify below.
-      'CardExpiry'    => str_pad($this->_getParam('month'), 2, '0', STR_PAD_LEFT) . $exp_year = substr($this->_getParam('year'), -2),
-      // Not used for WSDL?
-      // 'CardHolderName' => $this->_getParam('credit_card_number'),
-      'CardCSC'       => $this->_getParam('cvv2'),
-      'StoreCard'     => 0
-    );
-
     // Ensure amount is in F2C expected format.
     $soap_vars['Amount'] = sprintf("%01.2f", $soap_vars['Amount']);
+
+    $reference = substr($this->_getParam('last_name') .', '. $this->_getParam('first_name') .' - '. $this->_getParam('email'), 0, 50);
 
     // Alter credit card type to F2C expected format.
     switch ($this->_getParam('credit_card_type')) {
       case 'Visa':
-        $soap_vars['CardType'] = 'VISA';
+        $card_type = 'VISA';
         break ;
       case 'MasterCard':
-        $soap_vars['CardType'] = 'MC';
+        $card_type = 'MC';
         break;
       case 'Amex':
-        $soap_vars['CardType'] = 'AMEX';
+        $card_type = 'AMEX';
         break;
       case 'Diners Club':
       case 'Diners':
@@ -203,7 +182,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
         // To enable this, visit
         // civicrm/admin/options/accept_creditcard?group=accept_creditcard&reset=1
         // and add a card type of 'Diners Club'
-        $soap_vars['CardType'] = 'DINERS';
+        $card_type = 'DINERS';
         break;
       default:
         // CiviCRM offers "Discover" by default, which Flo2Cash WebService
@@ -215,36 +194,106 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
         // You *could* try this, which would then throw an error on
         // processing if F2C reject it.
         //
-        // $soap_vars['CardType'] = strtoupper($this->_getParam['credit_card_type']);
+        // $card_type = strtoupper($this->_getParam['credit_card_type']);
         return self::error(9004, 'Unsupported credit card type: '. $this->_getParam['credit_card_type']);
     }
 
+    // Frequency ID - only used for recurring.
+    switch ($this->_getParam( 'frequency_unit' )) {
+      case 'week':
+        $freqId = 2;
+        break;
+      case 'month':
+        $freqId = 7;
+        break;
+      case 'year':
+        $freqId = 13;
+        break;
+      default:
+        $freqId = 0;
+        break;
+    }
+
+    if ($params['is_recur']) {
+      $soap_method = 'CreateRecurringCreditCardPlan';
+      $soap_vars = array(
+        'Username'       => $this->_paymentProcessor['user_name'],
+        'Password'       => $this->_paymentProcessor['password'],
+        'PlanDetails'    => array(
+          // 'CardName'              => '', // F2C don't seem to validate this anyway.
+          'CardName'             => $this->_getParam('first_name') . ' ' . $this->_getParam('last_name'),
+          // 'CardName'             => $this->_getParam('credit_card_owner'),
+          'CardNumber'            => $this->_getParam('credit_card_number'),
+          'CardType'              => $card_type,
+          'CardExpiry'            => str_pad($this->_getParam('month'), 2, '0', STR_PAD_LEFT) . $exp_year = substr($this->_getParam('year'), -2),
+          'Amount'                => sprintf('%01.2f', $this->_getParam('amount')),
+          'CountryID'             => 112, // New Zealand – See Appendix B
+          'ClientId'              => $this->_paymentProcessor['user_name'], // Flo2Cash Client ID
+          'ClientAccountId'       => $this->_paymentProcessor['signature'], // Flo2Cash Account ID
+          'FrequencyId'           => $freqId, // See Appendix C
+          // 'NumberOfPayment'      => 10,
+          // 'terminationdate'      => '2008/12/25',
+          'StartDate'             => strtotime('tomorrow'),
+          'Reference'             => $reference,
+          'Particular'            => $params['invoiceID'],
+          // 'Reference'            => $this->_getParam( 'credit_card_owner' ), // Merchant Particular
+        ),
+      );
+      // dpm(var_export($soap_vars,1), 'vars');
+    }
+    else {
+      $soap_method = 'ProcessPurchase';
+      $soap_vars = array(
+        'Username'      => $this->_paymentProcessor['user_name'],
+        'Password'      => $this->_paymentProcessor['password'],
+        'AccountId'     => $this->_paymentProcessor['signature'],
+        'Amount'        => sprintf('%01.2f', $this->_getParam('amount')),
+        /**
+         * I think this is a much nicer reference, but it's not
+         * unique. If you want to do this, do it in the CiviCRM alter
+         * payment processor params hook instead.
+         */
+        // 'Reference'    => substr(trim($this->_getParam('billing_first_name') .' '. $this->_getParam('billing_last_name') .' ('. $this->_getParam('email') .')'), 0, 50),
+        'Reference'     => $reference,
+        'Particular'    => $params['invoiceID'],
+        'Email'         => $this->_getParam('email'),
+        'CardNumber'    => $this->_getParam('credit_card_number'),
+        'CardType'      => $card_type,
+        'CardExpiry'    => str_pad($this->_getParam('month'), 2, '0', STR_PAD_LEFT) . $exp_year = substr($this->_getParam('year'), -2),
+        // Not used for WSDL?
+        // 'CardHolderName' => $this->_getParam('credit_card_number'),
+        'CardCSC'       => $this->_getParam('cvv2'),
+        'StoreCard'     => 0,
+      );
+    }
+
+    //dpm($soap_vars, 'vars');
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $soap_vars);
 
     try {
       $PaymentService = new F2CSoapClient($this->_paymentProcessor['url_api'], array('trace' => 1));
-      $result = $PaymentService->ProcessPurchase($soap_vars);
+      $result = $PaymentService->$soap_method($soap_vars);
       /*
-         self::debug(array(
-                      '$PaymentService' => $PaymentService,
-                      '$soap_vars' => $soap_vars,
-                      '$result' => $result,
-                      '$fault' => $fault,
-                      '$this' => $this,
-                      'url' => $this->_paymentProcessor['url_api'],
-                    ), 'success');
+        self::debug(array(
+        '$PaymentService' => $PaymentService,
+        '$soap_vars' => $soap_vars,
+        '$result' => $result,
+        '$fault' => $fault,
+        '$this' => $this,
+        'url' => $this->_paymentProcessor['url_api'],
+        ), 'success');
       */
     }
     catch (SoapFault $fault) {
       /*
-         self::debug(array(
-                      '$PaymentService' => $PaymentService,
-                      '$soap_vars' => $soap_vars,
-                      '$result' => $result,
-                      '$fault' => $fault,
-                      '$this' => $this,
-                      'url' => $this->_paymentProcessor['url_api'],
-                    ), 'failure');
+        self::debug(array(
+        '$PaymentService' => $PaymentService,
+        '$soap_vars' => $soap_vars,
+        '$result' => $result,
+        '$fault' => $fault,
+        '$this' => $this,
+        'url' => $this->_paymentProcessor['url_api'],
+        ), 'failure');
       */
       if (isset($fault->faultcode)) {
         $Actor = $fault->faultcode;
@@ -265,24 +314,14 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
         $ErrorMessage = 'Unknown SOAP error.';
       }
       /*
-         dpm($PaymentService, 'PaymentService');
-         dpm($fault, 'fault');
-         dpm($PaymentService->__getLastRequest(), 'lastRequest');
+        dpm($PaymentService, 'PaymentService');
+        dpm($fault, 'fault');
+        dpm($PaymentService->__getLastRequest(), 'lastRequest');
       */
       return self::error(9003, $ErrorMessage);
     }
     catch (Exception $ex) {
       return self::error(9002, $ex->get_errmsg());
-    }
-
-    if ($result->transactionresult->Status == 'SUCCESSFUL') {
-      $params['gross_amount'] = $result->transactionresult->Amount;
-      $params['trxn_id'] = $result->transactionresult->TransactionId;
-      $params['contribution_status_completed'] = 1;
-      return $params;
-    }
-    else {
-      return self::error(9001, 'Error: ' . $result->transactionresult->Message);
     }
   }
 
