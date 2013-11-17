@@ -1,9 +1,7 @@
 Flo2Cash WSDL Payment Processor
 ===============================
 
-This is a merchant-hosted (onsite) payment processor for CiviCRM.
-
-For more information about Flo2Cash services, see http://www.flo2cash.co.nz/
+This is a merchant-hosted (onsite) payment processor for CiviCRM. For more information about Flo2Cash services, see http://www.flo2cash.co.nz/
 
 ## Configuration
 
