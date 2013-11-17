@@ -12,6 +12,7 @@ For more information about Flo2Cash services, see http://www.flo2cash.co.nz/
 * Enable this extension (may need to refresh first).
 * CiviCRM: Admin → System → Payment Processors.
 * Add Payment Processor.
-* Select "Flo2Cash WebService"
-* Complete the form using your Flo2Cash live/dev credentials.
+* Select "Flo2Cash WebService" processor.
+* Complete form using your Flo2Cash live/dev credentials.
 * Add/edit contribution pages to use the new processor.
+
