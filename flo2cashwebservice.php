@@ -283,6 +283,15 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
     try {
       $payment_service = new F2CSoapClient($this->_paymentProcessor['url_api'], array('trace' => 1));
       $result = $payment_service->$soap_method($soap_vars);
+      if (isset($result->transactionresult->Status)) {
+        switch ($result->transactionresult->Status) {
+          case 'SUCCESSFUL':
+            return $params;
+
+          case 'FAILED':
+            return self::error(9008, $result->transactionresult->Status . ': ' . $result->transactionresult->Message);
+        }
+      }
     }
     catch (SoapFault $fault) {
       if (isset($fault->faultcode)) {
