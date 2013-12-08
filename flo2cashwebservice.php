@@ -252,6 +252,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
           'StartDate'             => strtotime('tomorrow'),
           'Reference'             => $reference,
           'Particular'            => $params['invoiceID'],
+          'Email'                 => ($this->_getParam('emailCustomer' == 'TRUE')) ? $this->_getParam('email') : '',          
           // Merchant Particular.
           // 'Reference'            => $this->_getParam( 'credit_card_owner' ),
         ),
@@ -267,7 +268,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
         'Amount'        => sprintf('%01.2f', $this->_getParam('amount')),
         'Reference'     => $reference,
         'Particular'    => $params['invoiceID'],
-        'Email'         => $this->_getParam('email'),
+        'Email'         => ($this->_getParam('emailCustomer' == 'TRUE')) ? $this->_getParam('email') : '',
         'CardNumber'    => $this->_getParam('credit_card_number'),
         'CardType'      => $card_type,
         'CardExpiry'    => str_pad($this->_getParam('month'), 2, '0', STR_PAD_LEFT) . $exp_year = substr($this->_getParam('year'), -2),
