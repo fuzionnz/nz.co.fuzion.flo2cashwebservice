@@ -161,9 +161,6 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
       $this->_setParam($field, $value);
     }
 
-    // Ensure amount is in F2C expected format.
-    $soap_vars['Amount'] = sprintf("%01.2f", $soap_vars['Amount']);
-
     $reference = $this->_getParam('last_name') .
       ', ' . $this->_getParam('first_name') .
       ' - ' . $this->_getParam('email');
@@ -227,7 +224,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
         break;
     }
 
-    if ($params['is_recur']) {
+    if (isset($params['is_recur'])) {
       $soap_method = 'CreateRecurringCreditCardPlan';
       $soap_vars = array(
         'Username'       => $this->_paymentProcessor['user_name'],
@@ -252,7 +249,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
           'StartDate'             => strtotime('tomorrow'),
           'Reference'             => $reference,
           'Particular'            => $params['invoiceID'],
-          'Email'                 => ($this->_getParam('emailCustomer' == 'TRUE')) ? $this->_getParam('email') : '',          
+          'Email'                 => ($this->_getParam('emailCustomer') == 'TRUE') ? $this->_getParam('email') : '',
           // Merchant Particular.
           // 'Reference'            => $this->_getParam( 'credit_card_owner' ),
         ),
@@ -268,7 +265,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
         'Amount'        => sprintf('%01.2f', $this->_getParam('amount')),
         'Reference'     => $reference,
         'Particular'    => $params['invoiceID'],
-        'Email'         => ($this->_getParam('emailCustomer' == 'TRUE')) ? $this->_getParam('email') : '',
+        'Email'         => ($this->_getParam('emailCustomer') == 'TRUE') ? $this->_getParam('email') : '',
         'CardNumber'    => $this->_getParam('credit_card_number'),
         'CardType'      => $card_type,
         'CardExpiry'    => str_pad($this->_getParam('month'), 2, '0', STR_PAD_LEFT) . $exp_year = substr($this->_getParam('year'), -2),
@@ -287,6 +284,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
       if (isset($result->transactionresult->Status)) {
         switch ($result->transactionresult->Status) {
           case 'SUCCESSFUL':
+            $params['trxn_id'] = $result->transactionresult->TransactionId;
             return $params;
 
           case 'FAILED':
