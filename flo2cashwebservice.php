@@ -228,7 +228,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
         break;
     }
 
-    if (isset($params['is_recur'])) {
+    if (isset($params['is_recur']) && $params['is_recur']) {
       $soap_method = 'CreateRecurringCreditCardPlan';
       $soap_vars = array(
         'Username'       => $this->_paymentProcessor['user_name'],
