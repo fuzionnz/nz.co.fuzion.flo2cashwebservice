@@ -81,7 +81,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
     $this->_processorName    = ts('Flo2Cash WebService');
 
     // Defaults here
-    $this->_setParam('emailCustomer', 'TRUE');
+    $this->_setParam('emailCustomer', 'FALSE');
     // We'll load settings from DB if present.
     $settings = array(
       'emailCustomer',
