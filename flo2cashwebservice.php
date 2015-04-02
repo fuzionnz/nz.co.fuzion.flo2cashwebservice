@@ -161,7 +161,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
       $this->_setParam($field, $value);
     }
 
-    //watchdog('flo2cash', 'this: @file @ @line: <pre>!this</pre>', array('@file' => __FILE__, '@line' => __LINE__, '!this' => print_r($this,1)), WATCHDOG_DEBUG);
+    // watchdog('flo2cash', 'this: @file @ @line: <pre>!this</pre>', array('@file' => __FILE__, '@line' => __LINE__, '!this' => print_r($this,1)), WATCHDOG_DEBUG);
     $reference = array(
       $this->_getParam('first_name'),
       $this->_getParam('last_name'),
@@ -287,7 +287,7 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
     try {
       $payment_service = new F2CSoapClient($this->_paymentProcessor['url_api'], array('trace' => 1));
       $result = $payment_service->$soap_method($soap_vars);
-      //watchdog('flo2cash', 'result: @file @ @line: <pre>!this</pre>', array('@file' => __FILE__, '@line' => __LINE__, '!this' => print_r($result,1)), WATCHDOG_DEBUG);
+      // watchdog('flo2cash', 'result: @file @ @line: <pre>!this</pre>', array('@file' => __FILE__, '@line' => __LINE__, '!this' => print_r($result,1)), WATCHDOG_DEBUG);
       if (isset($result->transactionresult->Status)) {
         switch ($result->transactionresult->Status) {
           case 'SUCCESSFUL':
@@ -295,9 +295,6 @@ class nz_co_fuzion_Flo2CashWebService extends CRM_Core_Payment {
             return $params;
 
           case 'FAILED':
-//            if (function_exists('dpm')) {
-//              dpm($result, 'result');
-//            }
             return self::error(9008, $result->transactionresult->Status . ': ' . $result->transactionresult->Message);
         }
       }
